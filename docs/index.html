@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vampanchino Birthday Tag</title>
+  <style>
+    :root { color-scheme: light dark; font-family: Inter, Arial, sans-serif; }
+    body { margin: 0; display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; background: #f5f5f5; color: #222; }
+    aside { padding: 16px; border-right: 1px solid #ccc; background: #fff; }
+    main { display: flex; justify-content: center; align-items: center; background: #e6e6e6; }
+    h1 { margin: 0 0 8px; }
+    form { display: grid; gap: 8px; margin: 12px 0; }
+    label { font-size: 14px; }
+    input, select, button { padding: 8px; font-size: 14px; }
+    canvas { background: #c8d1db; border: 2px solid #1d3557; box-shadow: 0 6px 16px rgba(0,0,0,0.2); width: 100%; max-width: 960px; aspect-ratio: 1 / 1; }
+    #status { margin-top: 8px; font-size: 13px; min-height: 18px; }
+    #hud { margin-top: 12px; font-size: 15px; line-height: 1.5; }
+    #howto { font-size: 13px; line-height: 1.5; color: #444; }
+    #winBanner { font-weight: 700; margin-top: 10px; }
+    .muted { color: #777; }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>Vampanchino</h1>
+    <p class="muted">Quick multiplayer birthday tag in Sant Antoni.</p>
+    <form id="joinForm">
+      <div>
+        <label for="name">Your name</label>
+        <input id="name" name="name" required placeholder="Player">
+      </div>
+      <div>
+        <label for="role">Choose your role</label>
+        <select id="role" name="role">
+          <option value="vampanchino">Vampanchino (chaser)</option>
+          <option value="runner">Runner (team)</option>
+        </select>
+      </div>
+      <div>
+        <label for="room">Room code (4-6 letters/numbers)</label>
+        <input id="room" name="room" required placeholder="SANT20" minlength="4" maxlength="6">
+      </div>
+      <button type="submit">Join room</button>
+    </form>
+    <div id="status"></div>
+    <div id="hud">
+      <div>Clock: <span id="clock">20:00</span></div>
+      <div>Collectibles: <span id="collectibles">0/0</span></div>
+      <div>Players: <span id="playersCount">0</span></div>
+      <div id="winBanner"></div>
+    </div>
+    <details id="howto" open>
+      <summary>How to play</summary>
+      <p>Use WASD or arrow keys to move. Vampanchino must tag all runners before midnight. Runners win by lasting until midnight or collecting all items. The orange cat darts quickly and sometimes naps.</p>
+      <p>Share the room code with friends; everyone joins the same code. Host the server separately (see README) and set <code>window.GAME_SERVER</code> to its websocket URL if hosting the frontend elsewhere.</p>
+    </details>
+  </aside>
+  <main>
+    <canvas id="game" width="960" height="960"></canvas>
+  </main>
+  <!-- Point the client at your hosted WebSocket server on Render -->
+  <script>window.GAME_SERVER="wss://vampanchino.onrender.com";</script>
+  <script src="game.js"></script>
+</body>
+</html>
+
