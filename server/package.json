@@ -1,0 +1,14 @@
+{
+  "name": "vampanchino-server",
+  "version": "0.1.0",
+  "description": "Lightweight WebSocket server for the Vampanchino birthday tag game",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "PORT=3000 node index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
+
