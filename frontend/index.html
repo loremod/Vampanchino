@@ -37,6 +37,14 @@
           <option value="runner">Runner (team)</option>
         </select>
       </div>
+      <div id="runnerPicker">
+        <label for="runner">Runner character</label>
+        <select id="runner" name="runner">
+          <option value="aleena">Aleena</option>
+          <option value="lorenzo">Lorenzo</option>
+          <option value="lily">Lily</option>
+        </select>
+      </div>
       <div>
         <label for="room">Room code (4-6 letters/numbers)</label>
         <input id="room" name="room" required placeholder="SANT20" minlength="4" maxlength="6">
@@ -46,7 +54,7 @@
     <div id="status"></div>
     <div id="hud">
       <div>Clock: <span id="clock">20:00</span></div>
-      <div>Collectibles: <span id="collectibles">0/0</span></div>
+      <div>Orange Thais: <span id="collectibles">0/0</span></div>
       <div>Players: <span id="playersCount">0</span></div>
       <div id="winBanner"></div>
     </div>
@@ -54,6 +62,7 @@
       <summary>How to play</summary>
       <p>Use WASD or arrow keys to move. Vampanchino must tag all runners before midnight. Runners win by lasting until midnight or collecting all items. The orange cat darts quickly and sometimes naps.</p>
       <p>Share the room code with friends; everyone joins the same code. Host the server separately (see README) and set <code>window.GAME_SERVER</code> to its websocket URL if hosting the frontend elsewhere.</p>
+      <p>Only one Vampanchino per room. Runners can pick Aleena, Lorenzo, or Lily.</p>
     </details>
   </aside>
   <main>

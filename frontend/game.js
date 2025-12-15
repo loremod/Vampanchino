@@ -7,6 +7,9 @@
   const collectiblesEl = document.getElementById('collectibles');
   const playersCountEl = document.getElementById('playersCount');
   const winBannerEl = document.getElementById('winBanner');
+  const roleEl = document.getElementById('role');
+  const runnerEl = document.getElementById('runner');
+  const runnerPicker = document.getElementById('runnerPicker');
 
   const GRID_SIZE = 12;
   const WORLD_SIZE = canvas.width; // square
@@ -14,6 +17,13 @@
   const ROLE_COLORS = {
     vampanchino: '#e63946',
     runner: '#2a9d8f',
+  };
+
+  const AVATAR_COLORS = {
+    vampanchino: '#e63946',
+    aleena: '#1f7a8c',
+    lorenzo: '#f4a261',
+    lily: '#9b5de5',
   };
 
   const state = {
@@ -71,9 +81,9 @@
   function drawCollectibles() {
     for (const c of state.collectibles) {
       if (c.collected) continue;
-      ctx.fillStyle = '#118ab2';
+      ctx.fillStyle = '#ff9e2c'; // Orange Thai
       ctx.fillRect(c.x - 8, c.y - 8, 16, 16);
-      ctx.strokeStyle = '#073b4c';
+      ctx.strokeStyle = '#c76b00';
       ctx.strokeRect(c.x - 8, c.y - 8, 16, 16);
     }
   }
@@ -87,11 +97,12 @@
     ctx.fillStyle = '#000';
     ctx.font = '12px Arial';
     ctx.fillText(mode === 'rest' ? 'Z' : '🐾', x - 6, y + 4);
+    ctx.fillText('Dolly', x - 14, y - 14);
   }
 
   function drawPlayers() {
     for (const p of state.players) {
-      const color = ROLE_COLORS[p.role] || '#555';
+      const color = AVATAR_COLORS[p.avatar || p.role] || ROLE_COLORS[p.role] || '#555';
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
@@ -154,6 +165,8 @@
 
   function setupControls() {
     window.addEventListener('keydown', (e) => {
+      const isFormField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
+      if (isFormField) return;
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
         e.preventDefault();
       }
@@ -165,6 +178,8 @@
       if (JSON.stringify(before) !== JSON.stringify(inputState)) sendInput();
     });
     window.addEventListener('keyup', (e) => {
+      const isFormField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
+      if (isFormField) return;
       const before = { ...inputState };
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') inputState.up = false;
       if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') inputState.down = false;
@@ -212,7 +227,7 @@
     }
   }
 
-  function connect(roomCode, role, name) {
+  function connect(roomCode, role, name, avatar) {
     if (socket) {
       socket.close();
     }
@@ -220,7 +235,7 @@
     socket = new WebSocket(WS_URL);
     socket.addEventListener('open', () => {
       setStatus('Connected, joining room...');
-      socket.send(JSON.stringify({ type: 'join', roomCode, role, name }));
+      socket.send(JSON.stringify({ type: 'join', roomCode, role, name, avatar }));
     });
     socket.addEventListener('message', handleMessage);
     socket.addEventListener('close', () => {
@@ -236,7 +251,18 @@
     const name = (data.get('name') || 'Player').toString().slice(0, 20);
     const roomCode = (data.get('room') || 'SANT20').toString().toUpperCase();
     const role = data.get('role') || 'runner';
-    connect(roomCode, role, name);
+    const avatar = role === 'runner' ? (data.get('runner') || 'aleena') : 'vampanchino';
+    connect(roomCode, role, name, avatar);
   });
+
+  roleEl.addEventListener('change', () => {
+    const role = roleEl.value;
+    if (role === 'runner') {
+      runnerPicker.style.display = 'block';
+    } else {
+      runnerPicker.style.display = 'none';
+    }
+  });
+  roleEl.dispatchEvent(new Event('change'));
 })();
 

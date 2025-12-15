@@ -81,6 +81,7 @@ function serializeState(room) {
       id: p.id,
       name: p.name,
       role: p.role,
+      avatar: p.avatar,
       x: p.x,
       y: p.y,
       tagged: p.tagged || false,
@@ -179,7 +180,8 @@ function tick(room) {
 
   // Collectibles pickup
   for (const p of room.players.values()) {
-    if (p.tagged && p.role === 'runner') continue;
+    if (p.role !== 'runner') continue; // Vampanchino cannot collect Orange Thais
+    if (p.tagged) continue;
     for (const c of room.collectibles) {
       if (c.collected) continue;
       if (dist(p, c) < 18) {
@@ -217,6 +219,11 @@ function tick(room) {
 function handleJoin(ws, msg) {
   const roomCode = (msg.roomCode || '').toString().toUpperCase().slice(0, 6);
   const role = msg.role === 'vampanchino' ? 'vampanchino' : 'runner';
+  const avatarRaw = (msg.avatar || '').toString().toLowerCase();
+  const allowedAvatars = ['aleena', 'lorenzo', 'lily'];
+  const avatar = role === 'runner'
+    ? (allowedAvatars.includes(avatarRaw) ? avatarRaw : 'aleena')
+    : 'vampanchino';
   const name = (msg.name || 'Player').toString().slice(0, 20);
   if (!roomCode) {
     ws.send(JSON.stringify({ type: 'error', message: 'Missing room code' }));
@@ -225,11 +232,19 @@ function handleJoin(ws, msg) {
   let room = rooms.get(roomCode);
   if (!room) room = createRoom(roomCode);
 
-  // Prevent duplicate vampanchino? allow >1; keep simple.
+  if (role === 'vampanchino') {
+    const alreadyVamp = Array.from(room.players.values()).some((p) => p.role === 'vampanchino');
+    if (alreadyVamp) {
+      ws.send(JSON.stringify({ type: 'error', message: 'Room already has a Vampanchino' }));
+      return;
+    }
+  }
+
   const player = {
     id: randId('p'),
     name,
     role,
+    avatar,
     x: randomPos().x,
     y: randomPos().y,
     input: { up: false, down: false, left: false, right: false },
